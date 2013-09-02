@@ -1,10 +1,10 @@
 package com.github.alexrichards.scribble;
 
 import android.app.Activity;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 
 import com.github.alexrichards.scribble.widget.BufferBuilder;
+import com.github.alexrichards.scribble.widget.PaintBrush;
 import com.github.alexrichards.scribble.widget.ScribbleCanvas;
 
 public class TestActivity extends Activity {
@@ -19,16 +19,7 @@ public class TestActivity extends Activity {
 
         scribbleCanvas = (ScribbleCanvas) findViewById(R.id.view_canvas);
 
-        Object nci = getLastNonConfigurationInstance();
-        if (nci instanceof Bitmap) {
-            scribbleCanvas.setBuffer((Bitmap) nci);
-        } else {
-            scribbleCanvas.setBuffer(new BufferBuilder(500, 500).background(0xFFFFFFFF).build());
-        }
-    }
-
-    @Override
-    public Object getLastNonConfigurationInstance() {
-        return scribbleCanvas.getBuffer();
+        scribbleCanvas.setBuffer(new BufferBuilder(700, 700).background(0xFFFFFFFF).build());
+        scribbleCanvas.setBrush(new PaintBrush.Builder().color(0xFF0000).alpha(0xFF).antialias(true).size(30.0f).build());
     }
 }

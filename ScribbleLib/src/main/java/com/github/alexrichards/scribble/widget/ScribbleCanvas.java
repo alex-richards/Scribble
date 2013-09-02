@@ -4,23 +4,15 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
-import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PointF;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
 public class ScribbleCanvas extends View {
-
-    private static final Paint PAINT = new Paint();
-
-    static {
-        PAINT.setAntiAlias(true);
-        PAINT.setColor(0xFFFF0000);
-        PAINT.setStyle(Paint.Style.STROKE);
-        PAINT.setStrokeWidth(4);
-    }
 
     private static final int POINTS = 3;
     private static final int FIRSTPOINT = 0;
@@ -29,15 +21,19 @@ public class ScribbleCanvas extends View {
 
     private Bitmap buffer;
 
+    private Brush brush;
+
     private final Canvas canvas = new Canvas();
 
     private final Matrix matrix = new Matrix();
     private final Matrix inverse = new Matrix();
 
-    private final PointF[] rawPoints = new PointF[POINTS];
     private final PointF[] points = new PointF[POINTS];
 
     private final Path path = new Path();
+
+    private final RectF invalidate = new RectF();
+    private final Rect invalidateOut = new Rect();
 
     public ScribbleCanvas(final Context context) {
         super(context);
@@ -86,7 +82,7 @@ public class ScribbleCanvas extends View {
                 hs = 1;
             }
 
-            if (hs != 1 || ws != 0) {
+            if (hs != 1 || ws != 1) {
                 final float scale = Math.min(ws, hs);
                 matrix.setScale(scale, scale);
             }
@@ -113,6 +109,10 @@ public class ScribbleCanvas extends View {
         canvas.setBitmap(buffer);
 
         requestLayout();
+    }
+
+    public void setBrush(Brush brush) {
+        this.brush = brush;
     }
 
     int getInternalWidth() {
@@ -154,19 +154,15 @@ public class ScribbleCanvas extends View {
 
             if (action == MotionEvent.ACTION_DOWN) {
                 for (int i = 0; i < POINT; ++i) {
-                    rawPoints[i] = null;
                     points[i] = null;
                 }
                 points[POINT] = point;
-                rawPoints[POINT] = rawPoint;
             } else if (action == MotionEvent.ACTION_MOVE || action == MotionEvent.ACTION_UP) {
                 for (int i = 0; i < POINT; ++i) {
                     int n = i + 1;
                     points[i] = points[n];
-                    rawPoints[i] = rawPoints[n];
                 }
                 points[POINT] = point;
-                rawPoints[POINT] = rawPoint;
 
                 PointF first = points[FIRSTPOINT];
                 PointF last = points[LASTPOINT];
@@ -181,31 +177,11 @@ public class ScribbleCanvas extends View {
                     path.lineTo((last.x + point.x) / 2, (last.y + point.y) / 2);
                 }
 
-                if (!path.isEmpty()) {
-                    canvas.drawPath(path, PAINT);
+                if (brush != null) {
+                    matrix.mapRect(invalidate, brush.draw(canvas, path));
+                    invalidate.roundOut(invalidateOut);
+                    invalidate(invalidateOut);
                 }
-
-                float minX = Float.MAX_VALUE;
-                float minY = Float.MAX_VALUE;
-                float maxX = Float.MIN_VALUE;
-                float maxY = Float.MIN_VALUE;
-                for (PointF rp : rawPoints) {
-                    if (rp != null) {
-                        minX = Math.min(minX, rp.x);
-                        minY = Math.min(minY, rp.y);
-                        maxX = Math.max(maxX, rp.x);
-                        maxY = Math.max(maxY, rp.y);
-                    }
-                }
-
-                final float stroke = (PAINT.getStrokeWidth() / 2) + 0.5f;
-
-                minX -= stroke;
-                minY -= stroke;
-                maxX += stroke;
-                maxY += stroke;
-
-                invalidate((int) minX, (int) minY, (int) maxX, (int) maxY);
             }
 
             return true;
