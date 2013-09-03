@@ -164,20 +164,20 @@ public class ScribbleCanvas extends View {
                 }
                 points[POINT] = point;
 
-                PointF first = points[FIRSTPOINT];
-                PointF last = points[LASTPOINT];
-
-                path.reset();
-
-                if (first != null) {
-                    path.moveTo((first.x + last.x) / 2, (first.y + last.y) / 2);
-                    path.quadTo(last.x, last.y, (last.x + point.x) / 2, (last.y + point.y) / 2);
-                } else if (last != null) {
-                    path.moveTo(last.x, last.y);
-                    path.lineTo((last.x + point.x) / 2, (last.y + point.y) / 2);
-                }
-
                 if (brush != null) {
+                    PointF first = points[FIRSTPOINT];
+                    PointF last = points[LASTPOINT];
+
+                    path.reset();
+
+                    if (first != null) {
+                        path.moveTo((first.x + last.x) / 2, (first.y + last.y) / 2);
+                        path.quadTo(last.x, last.y, (last.x + point.x) / 2, (last.y + point.y) / 2);
+                    } else if (last != null) {
+                        path.moveTo(last.x, last.y);
+                        path.lineTo((last.x + point.x) / 2, (last.y + point.y) / 2);
+                    }
+
                     matrix.mapRect(invalidate, brush.draw(canvas, path));
                     invalidate.roundOut(invalidateOut);
                     invalidate(invalidateOut);

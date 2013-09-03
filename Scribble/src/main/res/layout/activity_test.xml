@@ -1,7 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.github.alexrichards.scribble.widget.ScribbleCanvas xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/view.canvas"
-    android:orientation="vertical"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#555" />
+    android:orientation="vertical">
+
+    <com.github.alexrichards.scribble.widget.ScribbleCanvas
+        android:id="@+id/view.canvas"
+        android:orientation="vertical"
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="#555" />
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/button.black"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="@string/label.black" />
+
+            <Button
+                android:id="@+id/button.white"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="@string/label.white" />
+
+            <Button
+                android:id="@+id/button.red"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="@string/label.red" />
+
+            <Button
+                android:id="@+id/button.green"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="@string/label.green" />
+
+            <Button
+                android:id="@+id/button.blue"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="@string/label.blue" />
+
+        </LinearLayout>
+    </HorizontalScrollView>
+</LinearLayout>

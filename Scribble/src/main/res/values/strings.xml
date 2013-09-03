@@ -3,4 +3,10 @@
 
     <string name="application.name">Scribble</string>
 
+    <string name="label.black">Black</string>
+    <string name="label.white">White</string>
+    <string name="label.red">Red</string>
+    <string name="label.green">Green</string>
+    <string name="label.blue">Blue</string>
+
 </resources>
