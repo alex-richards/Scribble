@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PointF;
 import android.graphics.Rect;
@@ -35,6 +36,8 @@ public class ScribbleCanvas extends View {
     private final RectF invalidate = new RectF();
     private final Rect invalidateOut = new Rect();
 
+    private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG | Paint.FILTER_BITMAP_FLAG);
+
     public ScribbleCanvas(final Context context) {
         super(context);
     }
@@ -49,8 +52,11 @@ public class ScribbleCanvas extends View {
 
     @Override
     protected void onMeasure(final int widthMeasureSpec, final int heightMeasureSpec) {
-        final int w;
-        final int h;
+        final int w = MeasureSpec.getSize(widthMeasureSpec);
+        final int wm = MeasureSpec.getMode(widthMeasureSpec);
+
+        final int h = MeasureSpec.getSize(heightMeasureSpec);
+        final int hm = MeasureSpec.getMode(heightMeasureSpec);
 
         if (buffer != null) {
             final int bw = buffer.getWidth();
@@ -62,42 +68,66 @@ public class ScribbleCanvas extends View {
             final int hp = pl + getPaddingRight();
             final int vp = pt + getPaddingBottom();
 
-            w = getDefaultSize(bw + hp, widthMeasureSpec);
-            h = getDefaultSize(bh + vp, heightMeasureSpec);
-
             final int iw = w - hp;
             final int ih = h - vp;
 
-            final float ws;
-            if (bw > iw) {
-                ws = iw / (float) bw;
+            final float sx;
+            if (wm != MeasureSpec.UNSPECIFIED && bw > iw) {
+                sx = iw / (float) bw;
             } else {
-                ws = 1;
+                sx = 1;
             }
 
-            float hs;
-            if (bh > ih) {
-                hs = ih / (float) bh;
+            final float sy;
+            if (hm != MeasureSpec.UNSPECIFIED && bh > ih) {
+                sy = ih / (float) bh;
             } else {
-                hs = 1;
+                sy = 1;
             }
 
-            if (hs != 1 || ws != 1) {
-                final float scale = Math.min(ws, hs);
-                matrix.setScale(scale, scale);
+            final float s = Math.min(sx, sy);
+            final int sbw = (int) (bw * s);
+            final int sbh = (int) (bh * s);
+
+            final int mw;
+            if (wm == MeasureSpec.EXACTLY) {
+                mw = w;
+            } else {
+                mw = sbw + hp;
             }
 
-            final int ho = (iw - bw) / 2;
-            final int vo = (ih - bh) / 2;
-            matrix.setTranslate(pl + ho, pt + vo);
+            final int mh;
+            if (hm == MeasureSpec.EXACTLY) {
+                mh = h;
+            } else {
+                mh = sbh + vp;
+            }
+
+            setMeasuredDimension(mw, mh);
+
+            matrix.reset();
+
+            matrix.preScale(s, s);
+            matrix.postTranslate(pl + ((iw - sbw) / 2), pt + ((ih - sbh) / 2));
 
             matrix.invert(inverse);
         } else {
-            w = MeasureSpec.getSize(widthMeasureSpec);
-            h = MeasureSpec.getSize(heightMeasureSpec);
-        }
+            final int mw;
+            if (wm != MeasureSpec.EXACTLY) {
+                mw = w;
+            } else {
+                mw = 0;
+            }
 
-        setMeasuredDimension(w, h);
+            final int mh;
+            if (hm != MeasureSpec.EXACTLY) {
+                mh = h;
+            } else {
+                mh = 0;
+            }
+
+            setMeasuredDimension(mw, mh);
+        }
     }
 
     public void createBuffer(final int width, final int height, final Bitmap.Config config) {
@@ -130,7 +160,7 @@ public class ScribbleCanvas extends View {
     @Override
     protected void onDraw(final Canvas canvas) {
         if (buffer != null) {
-            canvas.drawBitmap(buffer, matrix, null);
+            canvas.drawBitmap(buffer, matrix, paint);
         }
     }
 
@@ -141,8 +171,6 @@ public class ScribbleCanvas extends View {
 
             final float rx = event.getX();
             final float ry = event.getY();
-
-            final PointF rawPoint = new PointF(rx, ry);
 
             final float[] rxy = {rx, ry};
             inverse.mapPoints(rxy);

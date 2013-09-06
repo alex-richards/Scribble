@@ -30,7 +30,8 @@ public class TestActivity extends Activity {
 
         scribbleCanvas = (ScribbleCanvas) findViewById(R.id.view_canvas);
 
-        scribbleCanvas.setBuffer(new BufferBuilder(1400, 700).background(0xFFFFFFFF).build());
+        scribbleCanvas.setBuffer(new BufferBuilder(1000, 1000).background(0xFFFFFFFF).build());
+        scribbleCanvas.setBrush(BLACK);
 
         for (int i = 0; i < IDS.length; ++i) {
             final Brush brush = BRUSHES[i];
