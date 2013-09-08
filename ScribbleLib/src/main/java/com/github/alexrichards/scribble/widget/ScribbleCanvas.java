@@ -33,7 +33,6 @@ public class ScribbleCanvas extends View {
 
     private final Path path = new Path();
 
-    private final RectF invalidate = new RectF();
     private final Rect invalidateOut = new Rect();
 
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG | Paint.FILTER_BITMAP_FLAG);
@@ -130,8 +129,8 @@ public class ScribbleCanvas extends View {
         }
     }
 
-    public void createBuffer(final int width, final int height, final Bitmap.Config config) {
-        setBuffer(new BufferBuilder(width, height, config).build());
+    public Bitmap getBuffer() {
+        return buffer;
     }
 
     public void setBuffer(final Bitmap buffer) {
@@ -139,6 +138,10 @@ public class ScribbleCanvas extends View {
         canvas.setBitmap(buffer);
 
         requestLayout();
+    }
+
+    public Brush getBrush() {
+        return brush;
     }
 
     public void setBrush(Brush brush) {
@@ -151,10 +154,6 @@ public class ScribbleCanvas extends View {
 
     int getInternalHeight() {
         return getMeasuredHeight() - (getPaddingTop() + getPaddingBottom());
-    }
-
-    public Bitmap getBuffer() {
-        return buffer;
     }
 
     @Override
@@ -206,9 +205,12 @@ public class ScribbleCanvas extends View {
                         path.lineTo((last.x + point.x) / 2, (last.y + point.y) / 2);
                     }
 
-                    matrix.mapRect(invalidate, brush.draw(canvas, path));
-                    invalidate.roundOut(invalidateOut);
-                    invalidate(invalidateOut);
+                    RectF invalidate = brush.draw(canvas, path);
+                    if(invalidate != null){
+                        matrix.mapRect(invalidate);
+                        invalidate.roundOut(invalidateOut);
+                        invalidate(invalidateOut);
+                    }
                 }
             }
 
