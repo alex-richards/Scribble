@@ -1,23 +1,22 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.github.alexrichards.scribble"
     android:versionCode="1"
-    android:versionName="1.0">
+    android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="7"
-        android:targetSdkVersion="17" />
+        android:minSdkVersion="9"
+        android:targetSdkVersion="18" />
 
     <application
-        android:label="@string/application.name"
-        android:allowBackup="true">
-
-        <activity android:name="com.github.alexrichards.scribble.TestActivity">
+        android:allowBackup="true"
+        android:label="@string/application.name" >
+        <activity android:name="com.github.alexrichards.scribble.TestActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
     </application>
 
 </manifest>

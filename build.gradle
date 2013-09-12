@@ -8,8 +8,17 @@ buildscript {
     }
 }
 
-allprojects {
+subprojects {
     repositories {
         mavenCentral()
     }
+
+    project.ext.androidSdkVersion = 18
+    project.ext.androidToolsVersion = "18.0.1"
+    
+    project.ext.minSdkVersion = 9
+    project.ext.targetSdkVersion = 18
+    
+    project.ext.versionCode = 1
+    project.ext.versionName = 0.01
 }

@@ -1,17 +1,38 @@
 apply plugin: 'android'
 
 android {
-    compileSdkVersion 17
-    buildToolsVersion "18.0.1"
+    compileSdkVersion project.ext.androidSdkVersion
+    buildToolsVersion project.ext.androidToolsVersion
 
     defaultConfig {
-        minSdkVersion 7
-        targetSdkVersion 17
+        minSdkVersion project.ext.minSdkVersion
+        targetSdkVersion project.ext.targetSdkVersion
+    }
+    
+    project.ext.keystoreFile = file("../Scribble.keystore")
+    project.ext.keystorePasswordFile = file("../Scribble.keystore.password")
+    
+    if (project.ext.keystoreFile.canRead() && project.ext.keystorePasswordFile.canRead()) {
+    
+    	project.ext.keystorePassword = project.ext.keystorePasswordFile.text.trim()
+    
+	    signingConfigs {
+		    release {
+	            storeFile project.ext.keystoreFile
+	            storePassword project.ext.keystorePassword
+	            keyAlias "release"
+	            keyPassword project.ext.keystorePassword
+		    } 
+	    }
+	    
+	    buildTypes {
+	        release {
+	            signingConfig signingConfigs.release
+	        }
+	    }
     }
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:18.0.0'
-
     compile project(':ScribbleLib')
 }
