@@ -1,16 +1,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.github.alexrichards.scribble"
     android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionName="1.0">
 
     <uses-sdk
         android:minSdkVersion="9"
         android:targetSdkVersion="18" />
 
     <application
+        android:theme="@style/Theme.AppCompat"
         android:allowBackup="true"
-        android:label="@string/application.name" >
-        <activity android:name="com.github.alexrichards.scribble.TestActivity" >
+        android:label="@string/application.name">
+        <activity android:name=".ExampleCanvasActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

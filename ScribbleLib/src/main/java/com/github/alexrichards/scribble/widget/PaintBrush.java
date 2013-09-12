@@ -12,11 +12,11 @@ public class PaintBrush extends Brush {
     private final RectF invalidate = new RectF();
 
     public PaintBrush(Paint paint) {
-        this.paint = paint;
+        this.paint = new Paint(paint);
     }
 
     public Paint getPaint() {
-        return paint;
+        return new Paint(paint);
     }
 
     @Override
@@ -26,7 +26,7 @@ public class PaintBrush extends Brush {
 
             path.computeBounds(invalidate, true);
 
-            float stroke = paint.getStrokeWidth();
+            float stroke = paint.getStrokeWidth() / 2;
             invalidate.inset(-stroke, -stroke);
 
             return invalidate;
