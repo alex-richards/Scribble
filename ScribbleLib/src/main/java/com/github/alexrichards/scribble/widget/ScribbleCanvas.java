@@ -15,10 +15,7 @@ import android.view.View;
 
 public class ScribbleCanvas extends View {
 
-    private static final int POINTS = 3;
-    private static final int FIRSTPOINT = 0;
-    private static final int LASTPOINT = POINTS / 2;
-    private static final int POINT = POINTS - 1;
+    private static PointF NULL = new PointF(Float.NaN, Float.NaN);
 
     private Bitmap buffer;
 
@@ -29,7 +26,9 @@ public class ScribbleCanvas extends View {
     private final Matrix matrix = new Matrix();
     private final Matrix inverse = new Matrix();
 
-    private final PointF[] points = new PointF[POINTS];
+    private final PointF first = new PointF();
+    private final PointF prev = new PointF();
+    private final PointF curr = new PointF();
 
     private final Path path = new Path();
 
@@ -165,7 +164,7 @@ public class ScribbleCanvas extends View {
 
     @Override
     public boolean onTouchEvent(final MotionEvent event) {
-        if (buffer != null) {
+        if (buffer != null && brush != null) {
             final int action = event.getAction();
 
             final float rx = event.getX();
@@ -177,51 +176,38 @@ public class ScribbleCanvas extends View {
             final float x = rxy[0];
             final float y = rxy[1];
 
-            final PointF point = new PointF(x, y);
-
             if (action == MotionEvent.ACTION_DOWN) {
-                for (int i = 0; i < POINT; ++i) {
-                    points[i] = null;
-                }
-                points[POINT] = point;
-            } else if (action == MotionEvent.ACTION_MOVE || action == MotionEvent.ACTION_UP) {
-                for (int i = 0; i < POINT; ++i) {
-                    int n = i + 1;
-                    points[i] = points[n];
-                }
-                points[POINT] = point;
+                first.set(NULL);
+                prev.set(NULL);
+                curr.set(x, y);
+            } else if (action == MotionEvent.ACTION_MOVE || action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
+                first.set(prev);
+                prev.set(curr);
+                curr.set(x, y);
 
-                if (brush != null) {
-                    final PointF first = points[FIRSTPOINT];
-                    final PointF last = points[LASTPOINT];
+                final RectF invalidate;
 
-                    final RectF invalidate;
+                path.reset();
 
-                    path.reset();
-
-                    if (first != null) {
-                        path.moveTo((first.x + last.x) / 2, (first.y + last.y) / 2);
-                        path.quadTo(last.x, last.y, (last.x + point.x) / 2, (last.y + point.y) / 2);
-                        invalidate = brush.down(canvas, path);
-                    } else if (last != null) {
-                        if (action == MotionEvent.ACTION_UP) {
-                            path.moveTo((last.x + point.x) / 2, (last.y + point.y) / 2);
-                            path.lineTo(point.x, point.y);
-                            invalidate = brush.along(canvas, path);
-                        } else {
-                            path.moveTo(last.x, last.y);
-                            path.lineTo((last.x + point.x) / 2, (last.y + point.y) / 2);
-                            invalidate = brush.up(canvas, path);
-                        }
-                    } else {
-                        invalidate = null;
+                if (!first.equals(NULL)) {
+                    path.moveTo((first.x + prev.x) / 2, (first.y + prev.y) / 2);
+                    path.quadTo(prev.x, prev.y, (prev.x + curr.x) / 2, (prev.y + curr.y) / 2);
+                    if(action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL){
+                        path.lineTo(curr.x, curr.y);
+                        invalidate = brush.up(canvas, path);
+                    }else{
+                        invalidate = brush.along(canvas, path);
                     }
+                } else {
+                    path.moveTo(prev.x, prev.y);
+                    path.lineTo((prev.x + curr.x) / 2, (prev.y + curr.y) / 2);
+                    invalidate = brush.down(canvas, path);
+                }
 
-                    if (invalidate != null) {
-                        matrix.mapRect(invalidate);
-                        invalidate.roundOut(invalidateOut);
-                        invalidate(invalidateOut);
-                    }
+                if (invalidate != null) {
+                    matrix.mapRect(invalidate);
+                    invalidate.roundOut(invalidateOut);
+                    invalidate(invalidateOut);
                 }
             }
 

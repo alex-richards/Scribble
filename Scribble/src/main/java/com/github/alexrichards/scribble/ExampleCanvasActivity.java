@@ -1,5 +1,6 @@
 package com.github.alexrichards.scribble;
 
+import android.content.Context;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
@@ -84,7 +85,7 @@ public class ExampleCanvasActivity extends ActionBarActivity {
             }
         };
 
-        final PaletteAdapter paletteAdapter = new PaletteAdapter(paletteCallback, COLORS, SIZES);
+        final PaletteAdapter paletteAdapter = new PaletteAdapter(this, paletteCallback, COLORS, SIZES);
 
         final GridView gridView = (GridView) findViewById(R.id.view_palette);
         gridView.setAdapter(paletteAdapter);
@@ -118,12 +119,15 @@ public class ExampleCanvasActivity extends ActionBarActivity {
         private static final int TYPE_EMPTY = 2;
         private static final int TYPE_COUNT = 3;
 
+        private final LayoutInflater layoutInflater;
+
         private final PaletteCallback paletteCallback;
 
         private final int[] colors;
         private final float[] sizes;
 
-        public PaletteAdapter(PaletteCallback paletteCallback, int[] colors, float[] sizes) {
+        public PaletteAdapter(Context context, PaletteCallback paletteCallback, int[] colors, float[] sizes) {
+            this.layoutInflater = LayoutInflater.from(context);
             this.paletteCallback = paletteCallback;
             this.colors = colors;
             this.sizes = sizes;
@@ -182,7 +186,7 @@ public class ExampleCanvasActivity extends ActionBarActivity {
 
         private View getColorView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
-                convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_color, parent, false);
+                convertView = layoutInflater.inflate(R.layout.view_color, parent, false);
             }
 
             final ColorView colorView = (ColorView) convertView.findViewById(R.id.view_color);
@@ -193,7 +197,7 @@ public class ExampleCanvasActivity extends ActionBarActivity {
 
         private View getSizeView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
-                convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_size, parent, false);
+                convertView = layoutInflater.inflate(R.layout.view_size, parent, false);
             }
 
             final SizeView sizeView = (SizeView) convertView.findViewById(R.id.view_size);
@@ -204,7 +208,7 @@ public class ExampleCanvasActivity extends ActionBarActivity {
 
         private View getEmptyView(View convertView, ViewGroup parent) {
             if (convertView == null) {
-                convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_empty, parent, false);
+                convertView = layoutInflater.inflate(R.layout.view_empty, parent, false);
             }
             return convertView;
         }
