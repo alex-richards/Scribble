@@ -6,6 +6,10 @@ import android.graphics.RectF;
 
 public abstract class Brush {
 
-    protected abstract RectF draw(Canvas canvas, Path path);
+    protected abstract RectF down(Canvas canvas, Path path);
+
+    protected abstract RectF along(Canvas canvas, Path path);
+
+    protected abstract RectF up(Canvas canvas, Path path);
 
 }
