@@ -1,10 +1,9 @@
 package com.github.alexrichards.scribble.widget;
 
 import android.content.Context;
-import android.graphics.Canvas;
 import android.util.AttributeSet;
 
-public class ColorView extends SquareView {
+public class ColorView extends AbstractColoredCircleView {
 
     private int color;
 
@@ -25,15 +24,12 @@ public class ColorView extends SquareView {
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
-        int pl = getPaddingLeft();
-        int w = getWidth() - (pl + getPaddingRight());
-        int pt = getPaddingTop();
-        int h = getHeight() - (pt + getPaddingBottom());
-        int cc = canvas.save();
-        canvas.translate(pl, pt);
-        canvas.clipRect(0, 0, w, h);
-        canvas.drawColor(0xFF000000 | color);
-        canvas.restoreToCount(cc);
+    public int getColor() {
+        return color;
+    }
+
+    @Override
+    public float getScale() {
+        return 0.8f;
     }
 }

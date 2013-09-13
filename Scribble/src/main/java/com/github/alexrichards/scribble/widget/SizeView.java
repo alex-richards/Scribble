@@ -1,19 +1,9 @@
 package com.github.alexrichards.scribble.widget;
 
 import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.util.AttributeSet;
 
-public class SizeView extends SquareView {
-
-    private final Paint paint = new Paint();
-
-    {
-        paint.setColor(0xFF000000);
-        paint.setAntiAlias(true);
-        paint.setStyle(Paint.Style.FILL);
-    }
+public class SizeView extends AbstractColoredCircleView {
 
     private float maxSize;
     private float size;
@@ -36,15 +26,16 @@ public class SizeView extends SquareView {
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
-        if (size > 0 && maxSize > 0) {
-            int pl = getPaddingLeft();
-            int w = getWidth() - (pl + getPaddingRight());
-            int pt = getPaddingTop();
-            int h = getHeight() - (pt + getPaddingBottom());
-            canvas.translate(pl, pt);
-            float s = Math.min(w, h) * (size / maxSize);
-            canvas.drawCircle(w / 2, h / 2, s / 2, paint);
+    public int getColor() {
+        return 0x000000;
+    }
+
+    @Override
+    public float getScale() {
+        if (maxSize > 0) {
+            return size / maxSize;
+        } else {
+            return 0;
         }
     }
 }

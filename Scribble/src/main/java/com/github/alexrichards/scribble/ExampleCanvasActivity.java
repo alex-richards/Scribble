@@ -37,7 +37,7 @@ public class ExampleCanvasActivity extends ActionBarActivity {
     };
 
     private static final float[] SIZES = {
-            1.0f,
+            0,
             5.0f,
             10.0f,
     };
