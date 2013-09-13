@@ -26,9 +26,9 @@ public class ScribbleCanvas extends View {
     private final Matrix matrix = new Matrix();
     private final Matrix inverse = new Matrix();
 
-    private final PointF first = new PointF();
-    private final PointF prev = new PointF();
-    private final PointF curr = new PointF();
+    private final PointF first = new PointF(Float.NaN, Float.NaN);
+    private final PointF prev = new PointF(Float.NaN, Float.NaN);
+    private final PointF curr = new PointF(Float.NaN, Float.NaN);
 
     private final Path path = new Path();
 
@@ -176,44 +176,51 @@ public class ScribbleCanvas extends View {
             final float x = rxy[0];
             final float y = rxy[1];
 
-            if (action == MotionEvent.ACTION_DOWN) {
-                first.set(NULL);
-                prev.set(NULL);
-                curr.set(x, y);
-            } else if (action == MotionEvent.ACTION_MOVE || action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
-                first.set(prev);
-                prev.set(curr);
-                curr.set(x, y);
+            first.set(prev);
+            prev.set(curr);
+            curr.set(x, y);
 
-                final RectF invalidate;
+            path.reset();
+            final RectF invalidate;
 
-                path.reset();
-
-                if (!first.equals(NULL)) {
-                    path.moveTo((first.x + prev.x) / 2, (first.y + prev.y) / 2);
-                    path.quadTo(prev.x, prev.y, (prev.x + curr.x) / 2, (prev.y + curr.y) / 2);
-                    if(action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL){
-                        path.lineTo(curr.x, curr.y);
-                        invalidate = brush.up(canvas, path);
-                    }else{
-                        invalidate = brush.along(canvas, path);
-                    }
-                } else {
+            if (action == MotionEvent.ACTION_MOVE) {
+                if (first.equals(NULL)) {
                     path.moveTo(prev.x, prev.y);
                     path.lineTo((prev.x + curr.x) / 2, (prev.y + curr.y) / 2);
-                    invalidate = brush.down(canvas, path);
-                }
 
-                if (invalidate != null) {
-                    matrix.mapRect(invalidate);
-                    invalidate.roundOut(invalidateOut);
-                    invalidate(invalidateOut);
+                    invalidate = brush.down(canvas, path);
+                } else {
+                    path.moveTo((first.x + prev.x) / 2, (first.y + prev.y) / 2);
+                    path.quadTo(prev.x, prev.y, (prev.x + curr.x) / 2, (prev.y + curr.y) / 2);
+
+                    invalidate = brush.along(canvas, path);
                 }
+            } else if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
+                path.moveTo((prev.x + curr.x) / 2, (prev.y + curr.y) / 2);
+                path.lineTo(curr.x, curr.y);
+
+                invalidate = brush.up(canvas, path);
+
+                first.set(NULL);
+                prev.set(NULL);
+                curr.set(NULL);
+            }else{
+                invalidate = null;
             }
+
+            invalidateBuffer(invalidate);
 
             return true;
         } else {
             return false;
+        }
+    }
+
+    public void invalidateBuffer(RectF invalidate) {
+        if (invalidate != null) {
+            matrix.mapRect(invalidate);
+            invalidate.roundOut(invalidateOut);
+            invalidate(invalidateOut);
         }
     }
 }
