@@ -10,7 +10,8 @@
     <application
         android:theme="@style/Theme.AppCompat"
         android:allowBackup="true"
-        android:label="@string/application.name">
+        android:label="@string/application.name"
+        android:icon="@drawable/ic_launcher">
         <activity android:name=".ExampleCanvasActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
