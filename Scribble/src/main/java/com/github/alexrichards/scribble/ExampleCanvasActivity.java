@@ -1,7 +1,6 @@
 package com.github.alexrichards.scribble;
 
 import android.content.Context;
-import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -18,7 +17,7 @@ import android.widget.GridView;
 
 import com.github.alexrichards.scribble.widget.BufferBuilder;
 import com.github.alexrichards.scribble.widget.ColorView;
-import com.github.alexrichards.scribble.widget.PaintBrush;
+import com.github.alexrichards.scribble.widget.RoundBrush;
 import com.github.alexrichards.scribble.widget.ScribbleCanvas;
 import com.github.alexrichards.scribble.widget.SizeView;
 
@@ -56,32 +55,18 @@ public class ExampleCanvasActivity extends ActionBarActivity {
         drawerLayout = (DrawerLayout) findViewById(R.id.view_container);
         scribbleCanvas = (ScribbleCanvas) findViewById(R.id.view_canvas);
 
-        final Paint paint = new Paint();
-        paint.setAntiAlias(true);
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeCap(Paint.Cap.ROUND);
-
-        paint.setColor(COLORS[0]);
-        paint.setStrokeWidth(SIZES[0]);
-
-        scribbleCanvas.setBrush(new PaintBrush(paint));
-
         final PaletteAdapter.PaletteCallback paletteCallback = new PaletteAdapter.PaletteCallback() {
             @Override
             public void onColorSelected(int color) {
-                final PaintBrush brush = (PaintBrush) scribbleCanvas.getBrush();
-                final Paint paint = brush.getPaint();
-                paint.setColor(color);
-                scribbleCanvas.setBrush(new PaintBrush(paint));
+                RoundBrush brush = (RoundBrush) scribbleCanvas.getBrush();
+                brush.setColor(color);
                 drawerLayout.closeDrawer(Gravity.END);
             }
 
             @Override
             public void onSizeSelected(float size) {
-                final PaintBrush brush = (PaintBrush) scribbleCanvas.getBrush();
-                final Paint paint = brush.getPaint();
-                paint.setStrokeWidth(size);
-                scribbleCanvas.setBrush(new PaintBrush(paint));
+                RoundBrush brush = (RoundBrush) scribbleCanvas.getBrush();
+                brush.setSize(size);
                 drawerLayout.closeDrawer(Gravity.END);
             }
         };
@@ -94,6 +79,7 @@ public class ExampleCanvasActivity extends ActionBarActivity {
 
         if (savedInstanceState == null) {
             scribbleCanvas.setBuffer(new BufferBuilder(BUFFER_WIDTH, BUFFER_HEIGHT).background(0xFFFFFFFF).build());
+            scribbleCanvas.setBrush(new RoundBrush(COLORS[0], SIZES[0]));
         }
     }
 

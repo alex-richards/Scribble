@@ -5,18 +5,18 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
 
-public class PaintBrush extends Brush {
+abstract class PaintBrush extends Brush {
 
     private final Paint paint;
 
     private final RectF invalidate = new RectF();
 
-    public PaintBrush(Paint paint) {
-        this.paint = new Paint(paint);
+    public PaintBrush(final Paint paint) {
+        this.paint = paint;
     }
 
-    public Paint getPaint() {
-        return new Paint(paint);
+    protected Paint getPaint() {
+        return paint;
     }
 
     @Override

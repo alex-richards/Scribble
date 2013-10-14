@@ -228,7 +228,7 @@ public class ScribbleCanvas extends View {
 
     @Override
     protected Parcelable onSaveInstanceState() {
-        return new SavedState(super.onSaveInstanceState(), buffer);
+        return new SavedState(super.onSaveInstanceState(), buffer, brush);
     }
 
     @Override
@@ -237,33 +237,42 @@ public class ScribbleCanvas extends View {
         super.onRestoreInstanceState(savedState.getSuperState());
 
         final Bitmap savedBuffer = savedState.getBuffer();
-        if (savedBuffer != null) {
-            setBuffer(savedBuffer);
-        }
+        setBuffer(savedBuffer);
+
+        final Brush savedBrush = savedState.getBrush();
+        setBrush(savedBrush);
     }
 
     public static class SavedState extends BaseSavedState {
 
         private final Bitmap buffer;
+        private final Brush brush;
 
         private SavedState(final Parcel source) {
             super(source);
             buffer = source.readParcelable(null);
+            brush = source.readParcelable(null);
         }
 
-        private SavedState(final Parcelable superState, final Bitmap buffer) {
+        private SavedState(final Parcelable superState, final Bitmap buffer, final Brush brush) {
             super(superState);
             this.buffer = buffer;
+            this.brush = brush;
         }
 
         public Bitmap getBuffer() {
             return buffer;
         }
 
+        public Brush getBrush() {
+            return brush;
+        }
+
         @Override
         public void writeToParcel(final Parcel dest, final int flags) {
             super.writeToParcel(dest, flags);
             dest.writeParcelable(buffer, 0);
+            dest.writeParcelable(brush, 0);
         }
 
         public static final Creator<SavedState> CREATOR = new Creator<SavedState>() {
