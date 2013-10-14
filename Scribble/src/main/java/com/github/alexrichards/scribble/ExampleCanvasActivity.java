@@ -24,7 +24,8 @@ import com.github.alexrichards.scribble.widget.SizeView;
 
 public class ExampleCanvasActivity extends ActionBarActivity {
 
-    private static final int BUFFER_SIZE = 500;
+    private static final int BUFFER_WIDTH = 500;
+    private static final int BUFFER_HEIGHT = 700;
 
     private static final int[] COLORS = {
             0xFF000000,
@@ -47,21 +48,21 @@ public class ExampleCanvasActivity extends ActionBarActivity {
     private ScribbleCanvas scribbleCanvas;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_examplecanvas);
 
         drawerLayout = (DrawerLayout) findViewById(R.id.view_container);
-
         scribbleCanvas = (ScribbleCanvas) findViewById(R.id.view_canvas);
-        scribbleCanvas.setBuffer(new BufferBuilder(BUFFER_SIZE, BUFFER_SIZE).background(0xFFFFFFFF).build());
 
         final Paint paint = new Paint();
         paint.setAntiAlias(true);
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeCap(Paint.Cap.ROUND);
-        paint.setColor(0x00000000);
+
+        paint.setColor(COLORS[0]);
+        paint.setStrokeWidth(SIZES[0]);
 
         scribbleCanvas.setBrush(new PaintBrush(paint));
 
@@ -90,6 +91,10 @@ public class ExampleCanvasActivity extends ActionBarActivity {
         final GridView gridView = (GridView) findViewById(R.id.view_palette);
         gridView.setAdapter(paletteAdapter);
         gridView.setOnItemClickListener(paletteAdapter);
+
+        if (savedInstanceState == null) {
+            scribbleCanvas.setBuffer(new BufferBuilder(BUFFER_WIDTH, BUFFER_HEIGHT).background(0xFFFFFFFF).build());
+        }
     }
 
     @Override
@@ -126,7 +131,7 @@ public class ExampleCanvasActivity extends ActionBarActivity {
         private final int[] colors;
         private final float[] sizes;
 
-        public PaletteAdapter(Context context, PaletteCallback paletteCallback, int[] colors, float[] sizes) {
+        public PaletteAdapter(final Context context, final PaletteCallback paletteCallback, final int[] colors, final float[] sizes) {
             this.layoutInflater = LayoutInflater.from(context);
             this.paletteCallback = paletteCallback;
             this.colors = colors;
@@ -139,7 +144,7 @@ public class ExampleCanvasActivity extends ActionBarActivity {
         }
 
         @Override
-        public Object getItem(int position) {
+        public Object getItem(final int position) {
             return null;
         }
 
@@ -149,12 +154,12 @@ public class ExampleCanvasActivity extends ActionBarActivity {
         }
 
         @Override
-        public long getItemId(int position) {
+        public long getItemId(final int position) {
             return position;
         }
 
         @Override
-        public int getItemViewType(int position) {
+        public int getItemViewType(final int position) {
             final int t = position % 2;
             final int p = position / 2;
             if (t == TYPE_COLOR && p < colors.length) {
@@ -171,7 +176,7 @@ public class ExampleCanvasActivity extends ActionBarActivity {
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public View getView(final int position, final View convertView, final ViewGroup parent) {
             switch (getItemViewType(position)) {
                 case TYPE_COLOR:
                     return getColorView(position / 2, convertView, parent);
@@ -184,7 +189,7 @@ public class ExampleCanvasActivity extends ActionBarActivity {
             }
         }
 
-        private View getColorView(int position, View convertView, ViewGroup parent) {
+        private View getColorView(final int position, View convertView, final ViewGroup parent) {
             if (convertView == null) {
                 convertView = layoutInflater.inflate(R.layout.view_color, parent, false);
             }
@@ -195,7 +200,7 @@ public class ExampleCanvasActivity extends ActionBarActivity {
             return convertView;
         }
 
-        private View getSizeView(int position, View convertView, ViewGroup parent) {
+        private View getSizeView(final int position, View convertView, final ViewGroup parent) {
             if (convertView == null) {
                 convertView = layoutInflater.inflate(R.layout.view_size, parent, false);
             }
@@ -206,7 +211,7 @@ public class ExampleCanvasActivity extends ActionBarActivity {
             return convertView;
         }
 
-        private View getEmptyView(View convertView, ViewGroup parent) {
+        private View getEmptyView(View convertView, final ViewGroup parent) {
             if (convertView == null) {
                 convertView = layoutInflater.inflate(R.layout.view_empty, parent, false);
             }
@@ -214,12 +219,12 @@ public class ExampleCanvasActivity extends ActionBarActivity {
         }
 
         @Override
-        public boolean isEnabled(int position) {
+        public boolean isEnabled(final int position) {
             return getItemViewType(position) != TYPE_EMPTY;
         }
 
         @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
             if (paletteCallback != null) {
                 final int type = getItemViewType(position);
                 if (type == TYPE_COLOR) {

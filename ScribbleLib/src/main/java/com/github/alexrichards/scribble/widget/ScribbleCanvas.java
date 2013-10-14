@@ -9,6 +9,8 @@ import android.graphics.Path;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -204,7 +206,7 @@ public class ScribbleCanvas extends View {
                 first.set(NULL);
                 prev.set(NULL);
                 curr.set(NULL);
-            }else{
+            } else {
                 invalidate = null;
             }
 
@@ -222,5 +224,58 @@ public class ScribbleCanvas extends View {
             invalidate.roundOut(invalidateOut);
             invalidate(invalidateOut);
         }
+    }
+
+    @Override
+    protected Parcelable onSaveInstanceState() {
+        return new SavedState(super.onSaveInstanceState(), buffer);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(final Parcelable state) {
+        final SavedState savedState = (SavedState) state;
+        super.onRestoreInstanceState(savedState.getSuperState());
+
+        final Bitmap savedBuffer = savedState.getBuffer();
+        if (savedBuffer != null) {
+            setBuffer(savedBuffer);
+        }
+    }
+
+    public static class SavedState extends BaseSavedState {
+
+        private final Bitmap buffer;
+
+        private SavedState(final Parcel source) {
+            super(source);
+            buffer = source.readParcelable(null);
+        }
+
+        private SavedState(final Parcelable superState, final Bitmap buffer) {
+            super(superState);
+            this.buffer = buffer;
+        }
+
+        public Bitmap getBuffer() {
+            return buffer;
+        }
+
+        @Override
+        public void writeToParcel(final Parcel dest, final int flags) {
+            super.writeToParcel(dest, flags);
+            dest.writeParcelable(buffer, 0);
+        }
+
+        public static final Creator<SavedState> CREATOR = new Creator<SavedState>() {
+            @Override
+            public SavedState createFromParcel(final Parcel source) {
+                return new SavedState(source);
+            }
+
+            @Override
+            public SavedState[] newArray(final int size) {
+                return new SavedState[size];
+            }
+        };
     }
 }
