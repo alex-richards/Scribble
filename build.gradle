@@ -18,7 +18,9 @@ subprojects {
     
     project.ext.minSdkVersion = 9
     project.ext.targetSdkVersion = 18
-    
-    project.ext.versionCode = 101
-    project.ext.versionName = "1.01"
+
+    def versionName = "1.01"
+
+    project.ext.versionName = versionName
+    project.ext.versionCode = Integer.parseInt(versionName.replaceAll("\\D", ""))
 }
